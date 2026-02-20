@@ -1,0 +1,106 @@
+.logo-ticker-container {
+    width: 100%;
+    padding: 60px 0;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+    z-index: 5;
+}
+
+/* Grid overlay to match Hero and Experience sections */
+/* No grid here, we use the Hero grid */
+.logo-ticker-container::before {
+    display: none;
+}
+
+/* Gradient fades at the edges */
+.logo-ticker-container::after {
+    display: none;
+    /* Removing the old pseudo-element to use dedicated ones if needed, or keeping it for fades */
+}
+
+/* Dedicated fade elements for better control */
+.logo-ticker-fades {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.logo-ticker-fades::before,
+.logo-ticker-fades::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 250px;
+    height: 100%;
+}
+
+.logo-ticker-fades::before {
+    left: 0;
+    background: linear-gradient(to right, var(--color-dark-bg), transparent);
+}
+
+.logo-ticker-fades::after {
+    right: 0;
+    background: linear-gradient(to left, var(--color-dark-bg), transparent);
+}
+
+.logo-ticker-content {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll 40s linear infinite;
+    width: max-content;
+    position: relative;
+    z-index: 1;
+}
+
+.logo-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 80px;
+}
+
+.logo-item img {
+    height: 100px;
+    width: auto;
+    filter: invert(1) grayscale(1) brightness(0.8) contrast(1.2) opacity(0.5);
+    mix-blend-mode: screen;
+    /* Removes black backgrounds from logos */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-item:hover img {
+    filter: invert(1) grayscale(1) brightness(1.1) contrast(1.5) opacity(1);
+    transform: scale(1.1);
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .logo-ticker-container {
+        padding: 40px 0;
+    }
+
+    .logo-item {
+        padding: 0 40px;
+    }
+
+    .logo-item img {
+        height: 60px;
+    }
+
+    .logo-ticker-fades::before,
+    .logo-ticker-fades::after {
+        width: 120px;
+    }
+}

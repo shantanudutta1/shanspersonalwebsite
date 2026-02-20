@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice Generator + Clients (Improved)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            /* Colors */
+            --primary: #00a2ff;
+            --primary-dark: #0066cc;
+            --secondary: #ff4081;
+            --secondary-dark: #ff6b35;
+            --text-main: #1a1a1a;
+            --text-muted: #666;
+            --text-light: #fff;
+
+            /* Backgrounds */
+            --bg-body-start: #f8faff;
+            --bg-body-end: #e8f2ff;
+            --bg-glass: rgba(255, 255, 255, 0.9);
+            --bg-input: rgba(255, 255, 255, 0.8);
+
+            /* Borders & Shadows */
+            --border-glass: rgba(0, 162, 255, 0.3);
+            --border-light: rgba(0, 162, 255, 0.15);
+            --shadow-lg: 0 20px 40px rgba(0, 162, 255, 0.1);
+            --shadow-hover: 0 8px 20px rgba(0, 162, 255, 0.25);
+
+            /* Spacing & Radius */
+            --radius-sm: 8px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --spacing-xs: 6px;
+            --spacing-sm: 12px;
+            --spacing-md: 18px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+        }
+
+        /* ============================
+       RESET & BASE
+       ============================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-body-start) 0%, var(--bg-body-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        /* ============================
+       LAYOUT
+       ============================ */
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--secondary), var(--secondary-dark));
+        }
+
+        /* ============================
+       HEADER & TYPOGRAPHY
+       ============================ */
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: var(--spacing-xs);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 22px 0 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid rgba(0, 162, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        /* ============================
+       COMPONENTS: BUTTONS
+       ============================ */
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 14px 0 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+        }
+
+        .btn.ghost {
+            background: #fff;
+            color: var(--primary-dark);
+            border: 2px solid rgba(0, 102, 204, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ============================
+       COMPONENTS: FORMS
+       ============================ */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 800;
+            color: #3f3f3f;
+            margin-bottom: var(--spacing-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 12px 14px;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background: var(--bg-input);
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 162, 255, 0.1);
+        }
+
+        /* ============================
+       SPECIFIC SECTIONS
+       ============================ */
+        .rate-section {
+            background: linear-gradient(135deg, rgba(0, 162, 255, 0.05), rgba(255, 64, 129, 0.05));
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: var(--spacing-md);
+        }
+
+        .rate-group {
+            display: flex;
+            align-items: flex-end;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .rate-input {
+            flex: 1;
+        }
+
+        .calculate-btn {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--text-light);
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            height: 46px;
+            /* Match input height approx */
+        }
+
+        .hours-display {
+            background: rgba(0, 162, 255, 0.1);
+            border: 2px solid rgba(0, 162, 255, 0.3);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .hours-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .suggestions {
+            position: absolute;
+            background: #fff;
+            border: 2px solid rgba(0, 162, 255, 0.2);
+            border-radius: var(--radius-md);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+            max-height: 220px;
+            overflow: auto;
+            z-index: 9999;
+            width: calc(100% - 4px);
+            /* Adjust for border */
+            top: 100%;
+            margin-top: 4px;
+        }
+
+        .suggestions .item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f6fb;
+        }
+
+        .suggestions .item:hover {
+            background: #f3f9ff;
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .callout {
+            padding: 12px;
+            border: 2px dashed rgba(0, 162, 255, 0.35);
+            border-radius: 12px;
+            background: rgba(0, 162, 255, 0.05);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Micro-interactions */
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        input,
+        select,
+        textarea {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-group:focus-within label {
+            color: var(--primary);
+            transition: color 0.3s ease;
+        }
+
+        .client-list-item {
+            transition: background 0.2s ease, transform 0.2s ease;
+            border-radius: 8px;
+            padding: 10px;
+            /* Override inline padding if needed, but inline has priority. We'll rely on inline for now but add radius */
+        }
+
+        .client-list-item:hover {
+            background: rgba(0, 162, 255, 0.03);
+            transform: translateX(4px);
+        }
+
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            transform: translateX(100%);
+            animation: slideIn 0.3s forwards;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toast.error {
+            border-left-color: var(--secondary);
+        }
+
+        .toast.success {
+            border-left-color: #00c853;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        /* Validation */
+        .input-error {
+            border-color: var(--secondary) !important;
+            box-shadow: 0 0 0 3px rgba(255, 64, 129, 0.1) !important;
+        }
+
+        .error-msg {
+            color: var(--secondary);
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .input-error+.error-msg {
+            display: block;
+        }
+
+        /* ============================
+       RESPONSIVE
+       ============================ */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">SHANTANU DUTTA</div>
+            <div class="tagline">Invoice Generator + Client Directory</div>
+            <div class="actions">
+                <button class="btn" id="goInvoice">Invoice Page</button>
+                <button class="btn secondary" id="goClients">Add Client</button>
+                <button class="btn ghost" id="prefillDemo">Prefill Demo</button>
+                <button class="btn ghost" id="clearAll">Clear</button>
+            </div>
+        </div>
+
+        <!-- View: Invoice -->
+        <div id="view-invoice">
+            <form id="invoiceForm" autocomplete="off">
+                <div class="section-title">Client Information</div>
+                <div class="form-grid">
+                    <div class="form-group" style="position:relative">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" required autocomplete="off" />
+                        <div id="customerSuggestions" class="suggestions hidden"></div>
+                        <div class="small">Start typing to search saved clients →</div>
+                    </div>
+                    <div class="form-group"><label for="customerRep">Customer Representative</label><input type="text"
+                            id="customerRep" required /></div>
+                    <div class="form-group"><label for="addressLine1">Address Line 1</label><input type="text"
+                            id="addressLine1" required /></div>
+                    <div class="form-group"><label for="addressLine2">Address Line 2</label><input type="text"
+                            id="addressLine2" /></div>
+                    <div class="form-group"><label for="city">City</label><input type="text" id="city" required /></div>
+                    <div class="form-group"><label for="pinCode">Pin Code</label><input type="text" id="pinCode"
+                            required /></div>
+                    <div class="form-group"><label for="state">State</label><input type="text" id="state" required />
+                    </div>
+                    <div class="form-group"><label for="country">Country</label><input type="text" id="country"
+                            value="India" required /></div>
+                    <div class="form-group full-width"><label for="customerEmail">Customer Representative
+                            Email</label><input type="email" id="customerEmail" required /></div>
+                </div>
+
+                <div class="section-title">Invoice Details</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select id="month" required>
+                            <option value="">Select Month</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="invoiceNumber">Invoice Number</label><input type="text"
+                            id="invoiceNumber" required /></div>
+                    <div class="form-group"><label for="hoursPerDay">Hours per Day</label><input type="number"
+                            id="hoursPerDay" step="0.5" min="1" max="12" value="8" /></div>
+                    <div class="form-group"><label for="holidays">Number of Holidays Taken</label><input type="number"
+                            id="holidays" min="0" value="0" /></div>
+                    <div class="form-group"
+                        style="display:flex;flex-direction:row;align-items:center;gap:10px;margin-top:24px">
+                        <input type="checkbox" id="proRate" style="width:auto;margin:0" />
+                        <label for="proRate" style="margin:0;cursor:pointer">Pro-rate</label>
+                    </div>
+                    <div class="form-group"><label for="proRateHours">Pro-rate Hours</label><input type="number"
+                            id="proRateHours" step="0.5" min="0" disabled /></div>
+                    <div class="form-group full-width">
+                        <label for="defaultDescription">Default Description</label>
+                        <textarea id="defaultDescription" rows="3"
+                            placeholder="e.g., 20 hours/week of Salesforce development..."></textarea>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top:32px">Rate Information</div>
+                <div class="rate-section">
+                    <div class="rate-group">
+                        <div class="form-group rate-input"><label for="hourlyRate">Hourly Rate ($)</label><input
+                                type="number" id="hourlyRate" step="0.01" min="0" /></div>
+                    </div>
+                    <div class="rate-group">
+                        <div class="form-group rate-input"><label for="monthlyRate">Monthly Rate ($)</label><input
+                                type="number" id="monthlyRate" step="0.01" min="0" /></div>
+                    </div>
+                    <div class="hours-display hidden" id="hoursDisplay">
+                        <div class="hours-text" id="hoursText"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn secondary" style="width:100%;margin-top:16px">Generate
+                    Invoice</button>
+            </form>
+        </div>
+
+        <!-- View: Clients -->
+        <div id="view-clients" class="hidden">
+            <div class="section-title">Add / Edit Client</div>
+            <div class="callout small" style="margin-bottom:12px">
+                <b>Setup:</b> Paste your Google Apps Script Web App URL in <em>Settings</em> below. If left blank, data
+                is saved locally (browser only) so you can test right away.
+            </div>
+            <form id="clientForm" autocomplete="off">
+                <div class="form-grid">
+                    <div class="form-group"><label for="c_name">Customer Name</label><input type="text" id="c_name"
+                            required /></div>
+                    <div class="form-group"><label for="c_rep">Customer Representative</label><input type="text"
+                            id="c_rep" required /></div>
+                    <div class="form-group"><label for="c_addr1">Address Line 1</label><input type="text" id="c_addr1"
+                            required /></div>
+                    <div class="form-group"><label for="c_addr2">Address Line 2</label><input type="text"
+                            id="c_addr2" /></div>
+                    <div class="form-group"><label for="c_city">City</label><input type="text" id="c_city" required />
+                    </div>
+                    <div class="form-group"><label for="c_pin">Pin Code</label><input type="text" id="c_pin" required />
+                    </div>
+                    <div class="form-group"><label for="c_state">State</label><input type="text" id="c_state"
+                            required /></div>
+                    <div class="form-group"><label for="c_country">Country</label><input type="text" id="c_country"
+                            value="India" required /></div>
+                    <div class="form-group full-width"><label for="c_email">Customer Representative Email</label><input
+                            type="email" id="c_email" required /></div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label for="c_defaultHours">Default Hours/Day</label><input type="number"
+                            id="c_defaultHours" step="0.5" min="1" max="12" value="8" /></div>
+                    <div class="form-group"><label for="c_defaultRate">Default Hourly Rate ($)</label><input
+                            type="number" id="c_defaultRate" step="0.01" min="0" /></div>
+                </div>
+                <div class="actions" style="justify-content:flex-start">
+                    <button class="btn secondary" type="submit">Save Client</button>
+                    <button class="btn" id="newClient" type="button">New</button>
+                    <button class="btn ghost" id="backToInvoice" type="button">Back to Invoice</button>
+                </div>
+            </form>
+
+            <div class="section-title">Clients</div>
+            <div class="small" style="margin-bottom:8px">Search your saved clients</div>
+            <div class="form-grid">
+                <div class="form-group full-width"><input type="text" id="clientSearch"
+                        placeholder="Search client by name..." /></div>
+            </div>
+            <div id="clientList" class="small"></div>
+
+            <div class="section-title">Settings</div>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="apiUrl">Google Apps Script Web App URL</label>
+                    <input type="url" id="apiUrl" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec" />
+                    <div class="small">Saved locally as <code>gsApiUrl</code>. Used by both pages.</div>
+                </div>
+            </div>
+            <div class="actions" style="justify-content:flex-start">
+                <button class="btn" id="saveSettings" type="button">Save Settings</button>
+                <button class="btn ghost" id="testConnection" type="button">Test Connection</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================
+        // CONFIG & UTILITIES
+        // ============================
+        const LS_CLIENTS_KEY = 'clientStore_v1';
+        const LS_API_URL_KEY = 'gsApiUrl';
+
+        function getApiUrl() {
+            return (localStorage.getItem(LS_API_URL_KEY) || '').trim();
+        }
+        function setApiUrl(u) {
+            localStorage.setItem(LS_API_URL_KEY, (u || '').trim());
+        }
+        function toast(msg, type = 'info') {
+            let c = document.querySelector('.toast-container');
+            if (!c) { c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); }
+
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerHTML = `<span>${msg}</span>`;
+            c.appendChild(t);
+
+            setTimeout(() => { t.style.animation = 'slideOut 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        async function fetchJSON(url, opts = {}) {
+            const res = await fetch(url, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts));
+            if (!res.ok) { throw new Error('HTTP ' + res.status); }
+            return res.json();
+        }
+
+        function loadLocalClients() {
+            try { return JSON.parse(localStorage.getItem(LS_CLIENTS_KEY) || '[]'); } catch (e) { return []; }
+        }
+        function saveLocalClients(clients) {
+            localStorage.setItem(LS_CLIENTS_KEY, JSON.stringify(clients || []));
+        }
+        function upsertLocalClient(client) {
+            const list = loadLocalClients();
+            const i = list.findIndex(c => (c.name || '').toLowerCase() === (client.name || '').toLowerCase());
+            if (i >= 0) list[i] = client; else list.push(client);
+            saveLocalClients(list);
+        }
+
+        function clientFromForm(prefix) {
+            const g = id => document.getElementById(prefix + id);
+            return {
+                name: g('_name').value.trim(),
+                rep: g('_rep').value.trim(),
+                address1: g('_addr1').value.trim(),
+                address2: g('_addr2').value.trim(),
+                city: g('_city').value.trim(),
+                pin: g('_pin').value.trim(),
+                state: g('_state').value.trim(),
+                country: g('_country').value.trim(),
+                email: g('_email').value.trim(),
+                defaultHours: parseFloat(document.getElementById(prefix + '_defaultHours')?.value || '') || undefined,
+                defaultRate: parseFloat(document.getElementById(prefix + '_defaultRate')?.value || '') || undefined
+            };
+        }
+
+        function fillClientForm(client) {
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+            set('c_name', client.name);
+            set('c_rep', client.rep);
+            set('c_addr1', client.address1);
+            set('c_addr2', client.address2);
+            set('c_city', client.city);
+            set('c_pin', client.pin);
+            set('c_state', client.state);
+            set('c_country', client.country || 'India');
+            set('c_email', client.email);
+            if (client.defaultHours != null) set('c_defaultHours', client.defaultHours);
+            if (client.defaultRate != null) set('c_defaultRate', client.defaultRate);
+        }
+
+        function fillInvoiceFormFromClient(client) {
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+            set('customerName', client.name);
+            set('customerRep', client.rep);
+            set('addressLine1', client.address1);
+            set('addressLine2', client.address2);
+            set('city', client.city);
+            set('pinCode', client.pin);
+            set('state', client.state);
+            set('country', client.country || 'India');
+            set('customerEmail', client.email);
+            if (client.defaultHours != null) document.getElementById('hoursPerDay').value = client.defaultHours;
+            if (client.defaultRate != null) {
+                document.getElementById('hourlyRate').value = client.defaultRate;
+            }
+            hideSuggestions();
+        }
+
+        // ============================
+        // GOOGLE APPS SCRIPT BACKEND
+        // ============================
+        // GET  ?action=listClients&query=PARTIAL -> { ok:true, clients:[{...}] }
+        // POST body JSON { action:'addOrUpdateClient', client:{...} } -> { ok:true }
+
+        async function apiListClients(query) {
+            const api = getApiUrl();
+            if (!api) {
+                const lc = loadLocalClients();
+                const q = (query || '').toLowerCase();
+                return lc.filter(c => (c.name || '').toLowerCase().includes(q));
+            }
+            const url = api + '?action=listClients&query=' + encodeURIComponent(query || '');
+            try {
+                const data = await fetchJSON(url);
+                return data.clients || [];
+            } catch (e) { console.warn('API list failed, using local fallback', e); return loadLocalClients().filter(c => (c.name || '').toLowerCase().includes((query || '').toLowerCase())); }
+        }
+
+        async function apiAddOrUpdateClient(client) {
+            const api = getApiUrl();
+            if (!api) { upsertLocalClient(client); return { ok: true, local: true }; }
+            try {
+                const data = await fetchJSON(api, { method: 'POST', body: JSON.stringify({ action: 'addOrUpdateClient', client }) });
+                return data;
+            } catch (e) { console.warn('API save failed, saving locally', e); upsertLocalClient(client); return { ok: true, local: true }; }
+        }
+
+        // ============================
+        // INVOICE CALCULATIONS
+        // ============================
+        let currentHours = 0;
+        function getWorkingHoursInMonth(year, month, hoursPerDay = 8) {
+            const firstDay = new Date(year, month - 1, 1);
+            const lastDay = new Date(year, month, 0);
+            let workingDays = 0;
+            for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+                const dow = d.getDay(); // 0 Sun .. 6 Sat
+                if (dow >= 1 && dow <= 5) workingDays++;
+            }
+            const totalHours = workingDays * hoursPerDay;
+            const weeks = workingDays / 5; // float weeks
+            return { workingDays, totalHours, weeks, hoursPerDay };
+        }
+
+        function calcUsingMonthHours(cb) {
+            const monthValue = document.getElementById('month').value;
+            if (!monthValue) { toast('Please select a month first', 'error'); return null; }
+            const [yearStr, monthStr] = monthValue.split('-');
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value) || 8;
+            const info = getWorkingHoursInMonth(parseInt(yearStr, 10), parseInt(monthStr, 10), hoursPerDay);
+            currentHours = info.totalHours;
+            if (typeof cb === 'function') cb(info);
+            return info;
+        }
+
+        function showHours(text) {
+            const box = document.getElementById('hoursDisplay');
+            const t = document.getElementById('hoursText');
+            t.textContent = text; box.classList.remove('hidden');
+        }
+
+        function calculateMonthly() {
+            const hourlyRateValue = document.getElementById('hourlyRate').value;
+            if (!hourlyRateValue || parseFloat(hourlyRateValue) <= 0) { toast('Please enter a valid hourly rate', 'error'); return; }
+            const hourlyRate = parseFloat(hourlyRateValue);
+            const info = calcUsingMonthHours(); if (!info) return;
+            const monthlyRate = hourlyRate * info.totalHours;
+            document.getElementById('monthlyRate').value = monthlyRate.toFixed(2);
+            showHours(`${info.totalHours.toFixed(1)} hours (${info.workingDays} working days × ${info.hoursPerDay} hrs/day) = $${monthlyRate.toFixed(2)}`);
+        }
+
+        function calculateHourly() {
+            const monthlyRateValue = document.getElementById('monthlyRate').value;
+            if (!monthlyRateValue || parseFloat(monthlyRateValue) <= 0) { toast('Please enter a valid monthly rate', 'error'); return; }
+            const monthlyRate = parseFloat(monthlyRateValue);
+            const info = calcUsingMonthHours(); if (!info) return;
+            const hourlyRate = monthlyRate / info.totalHours;
+            document.getElementById('hourlyRate').value = hourlyRate.toFixed(2);
+            showHours(`${info.totalHours.toFixed(1)} hours (${info.workingDays} working days × ${info.hoursPerDay} hrs/day) = $${hourlyRate.toFixed(2)}/hour`);
+        }
+
+        function generateInvoiceHTML(data, hours) {
+            const monthNames = { '01': 'January', '02': 'February', '03': 'March', '04': 'April', '05': 'May', '06': 'June', '07': 'July', '08': 'August', '09': 'September', '10': 'October', '11': 'November', '12': 'December' };
+            const [year, month] = data.month.split('-');
+            const monthName = monthNames[month];
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value) || 8;
+            const hoursPerWeek = hoursPerDay * 5;
+            const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice ${data.invoiceNumber}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(135deg,#f8faff 0%,#e8f2ff 100%);min-height:100vh;padding:40px 20px;color:#1a1a1a; -webkit-print-color-adjust: exact; print-color-adjust: exact;}
+    .invoice-container{max-width:800px;margin:0 auto;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border:2px solid rgba(0,162,255,.3);border-radius:16px;padding:30px;box-shadow:0 20px 40px rgba(0,162,255,.1);position:relative;overflow:hidden}
+    .invoice-container::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#00a2ff,#0066cc,#ff4081,#ff6b35)}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid rgba(0,162,255,.2)}
+    .logo{font-size:24px;font-weight:700;background:linear-gradient(135deg,#00a2ff,#ff4081);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;letter-spacing:-.5px}
+    .tagline{color:#666;font-size:14px;font-weight:400;text-transform:uppercase;letter-spacing:2px}
+    .invoice-info{text-align:right}
+    .invoice-title{font-size:36px;font-weight:300;color:#1a1a1a;margin-bottom:8px;letter-spacing:-1px}
+    .invoice-number{color:#00a2ff;font-size:16px;font-weight:600;margin-bottom:4px}
+    .invoice-date{color:#666;font-size:14px}
+    .toolbar{margin-top:20px;text-align:center;}
+    .btn-print{background:#00a2ff;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,162,255,0.3);transition:all 0.2s}
+    .btn-print:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,162,255,0.4)}
+    .contact-info{margin:6px 0 16px;text-align:right}
+    .contact-info p{color:#555;font-size:14px;margin-bottom:3px}
+    .contact-info .email{color:#00a2ff}
+    .section-title{font-size:12px;font-weight:700;color:#00a2ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+    .client-details{background:rgba(0,162,255,.05);border:2px solid rgba(0,162,255,.15);border-radius:8px;padding:15px;margin-bottom:16px}
+    .client-name{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:6px}
+    .client-address{color:#555;line-height:1.6;font-size:14px}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.85);border-radius:8px;overflow:hidden;border:2px solid rgba(0,162,255,.15)}
+    th{background:linear-gradient(135deg,rgba(0,162,255,.15),rgba(255,64,129,.15));color:#1a1a1a;padding:16px;text-align:left;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid rgba(0,162,255,.2)}
+    td{padding:18px;border-bottom:1px solid rgba(0,162,255,.1);color:#444}
+    tr:last-child td{border-bottom:none}
+    .service-description{font-weight:600;color:#1a1a1a;margin-bottom:4px}
+    .service-details{font-size:13px;color:#666}
+    .amount{font-weight:700;color:#00a2ff;font-size:16px}
+    .total-section{margin-top:18px;padding-top:16px;border-top:3px solid rgba(0,162,255,.3);background:linear-gradient(135deg,rgba(0,162,255,.05),rgba(255,64,129,.05));border-radius:8px;padding:20px}
+    .total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .total-label{font-size:18px;font-weight:700;color:#1a1a1a}
+    .total-amount{font-size:28px;font-weight:800;background:linear-gradient(135deg,#00a2ff,#ff4081);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .payment-terms{margin-top:16px;padding:15px;background:linear-gradient(135deg,rgba(255,68,129,.08),rgba(255,107,53,.08));border:2px solid rgba(255,68,129,.3);border-radius:12px}
+    .payment-terms h3{color:#ff4081;font-size:14px;font-weight:800;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+    .payment-terms p{color:#444;line-height:1.6;font-size:14px}
+    .footer{margin-top:16px;text-align:center;color:#666;font-size:12px;padding-top:16px;border-top:2px solid rgba(0,162,255,.2)}
+    
+    @page { size: A4; margin: 0; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .invoice-container { width: 100%; max-width: none; border: none; box-shadow: none; border-radius: 0; padding: 40px; }
+      .toolbar { display: none !important; }
+      .invoice-container::before { display: none; }
+      .logo { 
+        background: none !important; 
+        -webkit-background-clip: unset !important; 
+        -webkit-text-fill-color: #00a2ff !important; 
+        background-clip: unset !important;
+        color: #00a2ff !important;
+      }
+      .total-amount {
+        background: none !important;
+        -webkit-background-clip: unset !important;
+        -webkit-text-fill-color: #00a2ff !important;
+        background-clip: unset !important;
+        color: #00a2ff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-container">
+    <div class="header">
+      <div>
+        <div class="logo">SHANTANU DUTTA</div>
+        <div class="tagline">Salesforce Consulting</div>
+      </div>
+      <div class="invoice-info">
+        <div class="invoice-title">INVOICE</div>
+        <div class="invoice-number">#${data.invoiceNumber}</div>
+        <div class="invoice-date">${currentDate}</div>
+      </div>
+    </div>
+
+    <div class="contact-info">
+      <p>Shantanu Mihir Dutta</p>
+      <p class="email">shantanu.m.dutta@gmail.com</p>
+      <p>+919021476818</p>
+      <p>Pune, 411014</p>
+    </div>
+
+    <div class="section-title">Bill To</div>
+    <div class="client-details">
+      <div class="client-name">${data.customerName}</div>
+      <div class="client-address">
+        ${data.customerRep}<br/>
+        ${data.addressLine1}<br/>
+        ${data.addressLine2 ? data.addressLine2 + '<br/>' : ''}
+        ${data.city}, ${data.state} ${data.pinCode}<br/>
+        ${data.country}<br/>
+        ${data.customerEmail}
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Description</th><th style="text-align:center">Hours</th><th style="text-align:right">Amount</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="service-description">Salesforce Consulting Services</div>
+            <div class="service-details">Invoice for the month of ${monthName} ${year}<br/>${data.description}</div>
+          </td>
+          <td style="text-align:center;color:#00a2ff;font-weight:600">${hours.toFixed(1)} hrs</td>
+          <td style="text-align:right"><div class="amount">$${parseFloat(data.monthlyRate).toFixed(2)}</div></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="total-section">
+      <div class="total-row">
+        <div class="total-label">Total Due</div>
+        <div class="total-amount">$${parseFloat(data.monthlyRate).toFixed(2)}</div>
+      </div>
+    </div>
+
+    <div class="payment-terms">
+      <h3>Payment Terms</h3>
+      <p>Payment is due upon receipt of invoice. Please include the invoice number with your payment.</p>
+    </div>
+
+    <div class="payment-terms" style="margin-top: 12px;">
+      <h3>Bank Details</h3>
+      <p><strong>Bank Name:</strong> Kotak Mahindra Bank<br/>
+         <strong>Account Holder:</strong> Shantanu Mihir Dutta<br/>
+         <strong>Account Number:</strong> 2649453957<br/>
+         <strong>SWIFT CODE:</strong> KKBKINBBXXX<br/>
+         <strong>UPI ID:</strong> 9021476818@kotak</p>
+    </div>
+
+    <div class="footer">Thank you for your business! Questions? Contact me at shantanu.m.dutta@gmail.com</div>
+    
+    <div class="toolbar">
+      <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+</body>
+</html>`;
+        }
+
+        function generateInvoice() {
+            // Clear previous errors
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+            document.querySelectorAll('.error-msg').forEach(el => el.remove());
+
+            const getVal = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value.trim() : '';
+            };
+
+            const data = {
+                customerName: getVal('customerName'),
+                customerRep: getVal('customerRep'),
+                addressLine1: getVal('addressLine1'),
+                addressLine2: getVal('addressLine2'),
+                city: getVal('city'),
+                pinCode: getVal('pinCode'),
+                state: getVal('state'),
+                country: getVal('country'),
+                customerEmail: getVal('customerEmail'),
+                month: document.getElementById('month').value,
+                invoiceNumber: getVal('invoiceNumber'),
+                hourlyRate: document.getElementById('hourlyRate').value,
+                monthlyRate: document.getElementById('monthlyRate').value,
+                description: getVal('defaultDescription')
+            };
+
+            const required = [
+                ['customerName', 'Customer Name'], ['customerRep', 'Representative'],
+                ['addressLine1', 'Address'], ['city', 'City'], ['pinCode', 'Pin Code'],
+                ['state', 'State'], ['customerEmail', 'Email'], ['month', 'Month'],
+                ['invoiceNumber', 'Invoice Number']
+            ];
+
+            let hasError = false;
+            for (const [key, label] of required) {
+                if (!data[key]) {
+                    const el = document.getElementById(key);
+                    if (el) {
+                        el.classList.add('input-error');
+                        const msg = document.createElement('div');
+                        msg.className = 'error-msg';
+                        msg.innerText = `${label} is required`;
+                        el.parentNode.appendChild(msg);
+                        hasError = true;
+                    }
+                }
+            }
+
+            if (hasError) {
+                toast('Please fix the errors above', 'error');
+                return;
+            }
+
+            if (!data.monthlyRate || parseFloat(data.monthlyRate) <= 0) {
+                toast('Please enter an hourly rate and select a month to calculate', 'error');
+                return;
+            }
+            // Recalculate one last time to be sure (or just trust the auto-calc state)
+            // We already have currentHours updated by calculateAuto
+
+            const invoiceHTML = generateInvoiceHTML(data, currentHours);
+            const w = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
+            if (!w) { toast('Please allow pop-ups', 'error'); return; }
+            w.document.write(invoiceHTML); w.document.close(); w.focus();
+        }
+
+        // ============================
+        // UI: NAVIGATION & WIRING
+        // ============================
+        const viewInvoice = document.getElementById('view-invoice');
+        const viewClients = document.getElementById('view-clients');
+        function showInvoice() { viewClients.classList.add('hidden'); viewInvoice.classList.remove('hidden'); }
+        function showClients() { viewInvoice.classList.add('hidden'); viewClients.classList.remove('hidden'); refreshClientList(); document.getElementById('apiUrl').value = getApiUrl(); }
+
+        document.getElementById('goInvoice').addEventListener('click', showInvoice);
+        document.getElementById('goClients').addEventListener('click', showClients);
+        document.getElementById('backToInvoice').addEventListener('click', showInvoice);
+
+        // Invoice events
+        // document.getElementById('calcMonthly').addEventListener('click', calculateMonthly); // Removed manual calc
+        // document.getElementById('calcHourly').addEventListener('click', calculateHourly); // Removed manual calc
+        document.getElementById('invoiceForm').addEventListener('submit', function (e) { e.preventDefault(); generateInvoice(); });
+
+        // Auto-Calculation Triggers
+        const calcInputs = ['month', 'hoursPerDay', 'holidays', 'proRate', 'proRateHours'];
+        calcInputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => calculateAuto('base'));
+        });
+
+        document.getElementById('hourlyRate').addEventListener('input', () => calculateAuto('hourly'));
+        document.getElementById('monthlyRate').addEventListener('input', () => calculateAuto('monthly'));
+
+        document.getElementById('proRate').addEventListener('change', (e) => {
+            const hoursInput = document.getElementById('proRateHours');
+            hoursInput.disabled = !e.target.checked;
+            if (!e.target.checked) hoursInput.value = '';
+            calculateAuto('base');
+        });
+
+        // Prefill & Clear helpers
+        document.getElementById('prefillDemo').addEventListener('click', () => {
+            document.getElementById('customerName').value = 'Acme Corp';
+            document.getElementById('customerRep').value = 'Jane Doe';
+            document.getElementById('addressLine1').value = '123 Market Street';
+            document.getElementById('addressLine2').value = 'Suite 500';
+            document.getElementById('city').value = 'San Francisco';
+            document.getElementById('pinCode').value = '94103';
+            document.getElementById('state').value = 'CA';
+            document.getElementById('country').value = 'USA';
+            document.getElementById('customerEmail').value = 'jane.doe@acme.com';
+            document.getElementById('hourlyRate').value = '75';
+            document.getElementById('hoursPerDay').value = '8';
+            document.getElementById('defaultDescription').value = '20 hours/week of Salesforce development, customization & strategic consulting';
+            calculateAuto('hourly');
+        });
+        document.getElementById('clearAll').addEventListener('click', () => {
+            document.getElementById('invoiceForm').reset();
+            document.getElementById('hoursDisplay').classList.add('hidden');
+        });
+
+        // ============================
+        // DYNAMIC DATES & AUTO-SAVE
+        // ============================
+        function populateMonths() {
+            const select = document.getElementById('month');
+            const today = new Date();
+            select.innerHTML = '<option value="">Select Month</option>';
+
+            // Generate range: -6 months to +6 months
+            for (let i = -6; i <= 6; i++) {
+                const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const value = `${year}-${month}`;
+                const label = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                const opt = document.createElement('option');
+                opt.value = value;
+                opt.textContent = label;
+                select.appendChild(opt);
+            }
+        }
+
+        const LS_DRAFT_KEY = 'invoice_draft_v1';
+        function saveFormState() {
+            const data = {};
+            document.querySelectorAll('#invoiceForm input, #invoiceForm select').forEach(el => {
+                if (el.id) data[el.id] = el.value;
+            });
+            localStorage.setItem(LS_DRAFT_KEY, JSON.stringify(data));
+        }
+
+        function restoreFormState() {
+            try {
+                const data = JSON.parse(localStorage.getItem(LS_DRAFT_KEY));
+                if (!data) return;
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
+                    if (el) el.value = data[key];
+                });
+            } catch (e) { console.error('Failed to restore draft', e); }
+        }
+
+        // Debounce save
+        let saveTimer;
+        document.getElementById('invoiceForm').addEventListener('input', () => {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveFormState, 500);
+        });
+
+        // Auto invoice number & default month
+        window.addEventListener('load', function () {
+            populateMonths();
+            restoreFormState();
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            // Default invoice number if empty
+            if (!document.getElementById('invoiceNumber').value) {
+                document.getElementById('invoiceNumber').value = `SF-${year}-${month}${day}`;
+            }
+
+            // Select current month if not set
+            if (!document.getElementById('month').value) {
+                const currentMonthValue = `${year}-${month}`;
+                const monthSelect = document.getElementById('month');
+                if ([...monthSelect.options].some(o => o.value === currentMonthValue)) monthSelect.value = currentMonthValue;
+            }
+        });
+
+        // ============================
+        // CLIENTS VIEW LOGIC
+        // ============================
+        document.getElementById('clientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const client = clientFromForm('c');
+            if (!client.name) { toast('Customer Name is required', 'error'); return; }
+            const res = await apiAddOrUpdateClient(client);
+            upsertLocalClient(client);
+            toast(res.local ? 'Saved locally (no API URL set).' : 'Saved to Google Sheet!', 'success');
+            refreshClientList();
+        });
+        document.getElementById('newClient').addEventListener('click', () => {
+            fillClientForm({ country: 'India', defaultHours: 8 });
+            document.getElementById('c_defaultRate').value = '';
+        });
+
+        document.getElementById('saveSettings').addEventListener('click', () => {
+            const url = document.getElementById('apiUrl').value.trim();
+            setApiUrl(url); toast('Settings saved', 'success');
+        });
+        document.getElementById('testConnection').addEventListener('click', async () => {
+            const url = getApiUrl(); if (!url) { toast('No API URL set', 'error'); return; }
+            try { const r = await fetchJSON(url + '?action=pulse'); toast('Connected OK ✔️', 'success'); }
+            catch (e) { toast('Connection failed. Check deployment permissions/URL.', 'error'); }
+        });
+
+        async function refreshClientList() {
+            const q = (document.getElementById('clientSearch').value || '').trim();
+            const clients = await apiListClients(q);
+            const list = document.getElementById('clientList');
+            if (!clients.length) { list.innerHTML = '<div class="small">No clients yet.</div>'; return; }
+            list.innerHTML = clients.map(c => `
+        <div class="client-list-item" style="padding:10px 0;border-bottom:1px solid #eef4ff">
+          <div style="font-weight:800">${c.name}</div>
+          <div>${c.rep || ''}</div>
+          <div class="small">${[c.address1, c.address2, c.city, c.state, c.pin].filter(Boolean).join(', ')}</div>
+          <div class="small">${c.email || ''}</div>
+          <div class="actions" style="justify-content:flex-start;margin-top:6px">
+            <button class="btn ghost" data-load="${encodeURIComponent(c.name)}" type="button">Load in Form</button>
+            <button class="btn" data-edit="${encodeURIComponent(c.name)}" type="button">Edit</button>
+          </div>
+        </div>
+      `).join('');
+            list.querySelectorAll('[data-load]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const name = decodeURIComponent(btn.getAttribute('data-load'));
+                    const matches = (await apiListClients(name)).filter(c => (c.name || '').toLowerCase() === name.toLowerCase());
+                    if (matches[0]) { fillInvoiceFormFromClient(matches[0]); showInvoice(); }
+                });
+            });
+            list.querySelectorAll('[data-edit]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const name = decodeURIComponent(btn.getAttribute('data-edit'));
+                    const matches = (await apiListClients(name)).filter(c => (c.name || '').toLowerCase() === name.toLowerCase());
+                    if (matches[0]) { fillClientForm(matches[0]); }
+                });
+            });
+        }
+        document.getElementById('clientSearch').addEventListener('input', refreshClientList);
+
+        // ============================
+        // AUTOCOMPLETE ON INVOICE PAGE
+        // ============================
+        let suggestTimer = null;
+        const nameInput = document.getElementById('customerName');
+        const sugBox = document.getElementById('customerSuggestions');
+
+        function hideSuggestions() { sugBox.classList.add('hidden'); sugBox.innerHTML = ''; }
+        function showSuggestions(items) {
+            if (!items.length) { hideSuggestions(); return; }
+            sugBox.innerHTML = items.map(c => `<div class="item" data-name="${encodeURIComponent(c.name)}">${c.name} <span class="small" style="float:right;color:#888">${c.city || ''}</span></div>`).join('');
+            sugBox.classList.remove('hidden');
+            Array.from(sugBox.querySelectorAll('.item')).forEach(el => {
+                el.addEventListener('click', async () => {
+                    const name = decodeURIComponent(el.getAttribute('data-name'));
+                    const matches = (await apiListClients(name)).filter(c => (c.name || '').toLowerCase() === name.toLowerCase());
+                    if (matches[0]) fillInvoiceFormFromClient(matches[0]);
+                });
+            });
+        }
+
+        nameInput.addEventListener('input', () => {
+            const q = nameInput.value.trim();
+            if (suggestTimer) clearTimeout(suggestTimer);
+            suggestTimer = setTimeout(async () => {
+                if (q.length < 2) { hideSuggestions(); return; }
+                const results = await apiListClients(q);
+                showSuggestions(results.slice(0, 8));
+            }, 200);
+        });
+        document.addEventListener('click', (e) => { if (!sugBox.contains(e.target) && e.target !== nameInput) hideSuggestions(); });
+
+        // ============================
+        // LOGIC: AUTO CALCULATION
+        // ============================
+        function calculateAuto(source) {
+            const monthVal = document.getElementById('month').value;
+
+            // If essential fields missing, clear output (unless we are just typing rates without month)
+            // But we need month for hours.
+            if (!monthVal) {
+                // If no month, we can't calc hours.
+                document.getElementById('hoursDisplay').classList.add('hidden');
+                return;
+            }
+
+            const [year, month] = monthVal.split('-');
+            const hoursPerDay = parseFloat(document.getElementById('hoursPerDay').value) || 8;
+            const holidays = parseFloat(document.getElementById('holidays').value) || 0;
+            const isProRate = document.getElementById('proRate').checked;
+
+            let totalHours = 0;
+            let workingDays = 0;
+            let info = null;
+
+            if (isProRate) {
+                totalHours = parseFloat(document.getElementById('proRateHours').value) || 0;
+                info = getWorkingHoursInMonth(parseInt(year, 10), parseInt(month, 10), hoursPerDay);
+                workingDays = info.workingDays;
+            } else {
+                info = getWorkingHoursInMonth(parseInt(year, 10), parseInt(month, 10), hoursPerDay);
+                workingDays = info.workingDays;
+                const holidayHours = holidays * hoursPerDay;
+                totalHours = Math.max(0, info.totalHours - holidayHours);
+            }
+
+            currentHours = totalHours; // Update global
+
+            // Bi-directional Logic
+            const hourlyInput = document.getElementById('hourlyRate');
+            const monthlyInput = document.getElementById('monthlyRate');
+
+            if (source === 'hourly' || source === 'base') {
+                // Driven by Hourly Rate OR Base params (Month/Days) -> Update Monthly
+                const hourlyRate = parseFloat(hourlyInput.value) || 0;
+                if (hourlyRate > 0) {
+                    const monthlyRate = totalHours * hourlyRate;
+                    monthlyInput.value = monthlyRate.toFixed(2);
+                }
+            } else if (source === 'monthly') {
+                // Driven by Monthly Rate -> Update Hourly
+                const monthlyRate = parseFloat(monthlyInput.value) || 0;
+                if (monthlyRate > 0 && totalHours > 0) {
+                    const hourlyRate = monthlyRate / totalHours;
+                    hourlyInput.value = hourlyRate.toFixed(2);
+                }
+            }
+
+            // Update Display
+            const hRate = parseFloat(hourlyInput.value) || 0;
+            const mRate = parseFloat(monthlyInput.value) || 0;
+
+            if (totalHours > 0 && (hRate > 0 || mRate > 0)) {
+                let displayText = '';
+                if (isProRate) {
+                    displayText = `Pro-rated: ${totalHours} hours × $${hRate.toFixed(2)}/hr = $${mRate.toFixed(2)}`;
+                } else {
+                    displayText = `${totalHours.toFixed(1)} hours (${workingDays} days - ${holidays} holidays) × ${hoursPerDay} hrs/day = $${mRate.toFixed(2)}`;
+                }
+                const hoursText = document.getElementById('hoursText');
+                hoursText.textContent = displayText;
+                document.getElementById('hoursDisplay').classList.remove('hidden');
+            } else {
+                document.getElementById('hoursDisplay').classList.add('hidden');
+            }
+        }
+
+        // ============================
+        // DONE
+        // ============================
+    </script>
+</body>
+
+</html>
