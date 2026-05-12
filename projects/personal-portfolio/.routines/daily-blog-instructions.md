@@ -1,6 +1,6 @@
 # Daily Salesforce Blog Draft Routine Instructions
 
-You are running a daily routine for Shantanu Dutta — senior Salesforce freelance consultant, shantanudutta.com.
+You are running a daily routine for Shantanu Dutta — senior Salesforce freelance consultant at <https://shantanudutta.com>.
 Email all output to: shantanu.m.dutta@gmail.com
 
 ---
@@ -9,19 +9,44 @@ Email all output to: shantanu.m.dutta@gmail.com
 
 Run these curl commands and read the titles:
 
-```
-curl -s --max-time 10 https://www.salesforceben.com/feed/ | grep -oP '(?<=<title>)[^<]+'  | head -15
+```bash
+curl -s --max-time 10 https://www.salesforceben.com/feed/ | grep -oP '(?<=<title>)[^<]+' | head -15
 curl -s --max-time 10 https://www.salesforce.com/blog/feed/ | grep -oP '(?<=<title>)[^<]+' | head -15
 curl -s --max-time 10 https://developer.salesforce.com/blogs/feed | grep -oP '(?<=<title>)[^<]+' | head -10
 ```
 
-Pick ONE topic that:
-- Is relevant to a senior Salesforce consultant's clients: CPQ, Revenue Cloud, Agentforce, Sales Cloud, Service Cloud, Data Cloud, AI, releases, admin best practices
-- Has NOT been covered already. Existing posts to avoid: "Salesforce Headless 360", "Spring 26 CPQ Changes", "Revenue Cloud vs CPQ"
-- Is timely and fresh — not old news from 2024 or earlier
+From the results, identify candidate topics that:
+
+- Are relevant to a senior Salesforce consultant's clients: CPQ, Revenue Cloud, Agentforce, Sales Cloud, Service Cloud, Data Cloud, AI, releases, admin best practices
+- Have NOT been covered already — existing posts to avoid: Salesforce Headless 360, Spring 26 CPQ Changes, Revenue Cloud vs CPQ
+- Are timely and fresh — announced or actively discussed in the last 7 days
 - Would interest a business decision-maker or senior admin, not just a developer
 
 If RSS feeds are unreachable, use your knowledge of recent 2026 Salesforce announcements.
+
+---
+
+## TOPIC QUALITY GATE — Run this before writing anything
+
+Score the best candidate topic against all five criteria below.
+
+**If any criterion fails: stop immediately. Do not write. Do not send an email. Exit silently.**
+
+Zero posts on a bad day is better than a mediocre post that hurts SEO.
+
+**Traffic potential checklist (must pass ALL five):**
+
+1. **Timely** — Was this topic announced, updated, or actively debated in the last 7 days? Evergreen knowledge with no recent trigger will not drive search traffic. Fail if not fresh.
+
+2. **Search demand** — Would a Salesforce admin, consultant, or decision-maker realistically Google this right now? Topics like "how does X work", "X vs Y", or "what the new X means for your org" have demand. Abstract or internal tooling topics do not. Fail if too niche.
+
+3. **Consultant-relevant** — Does it affect buying decisions, implementation projects, or org strategy? Pure developer topics (Apex syntax, LWC patterns, CLI tools) do not bring consulting leads. Fail if developer-only.
+
+4. **Not already saturated** — Is Salesforce Ben, the official Salesforce blog, or many other authoritative sites already covering this? If yes, a post from shantanudutta.com will rank nowhere. Fail if oversaturated.
+
+5. **Not already covered** — Is it a duplicate of the three existing posts listed above? Fail if duplicate.
+
+**Decision:** All 5 pass → proceed to STEP 2. Any criterion fails → stop, do nothing.
 
 ---
 
@@ -40,8 +65,8 @@ Emojis make posts look AI-generated. This rule has zero exceptions.
 
 1. Hook — a direct client question or provocative framing in 1-2 short paragraphs
 2. Plain-language explanation of the core concept
-3. The substance: 3 pillars, a comparison, or numbered features — with real practitioner examples
-4. A decision matrix table. Plain text cells only — no emoji in any cell
+3. The substance: 3 pillars, a comparison, or numbered features with real practitioner examples
+4. A decision matrix table — plain text cells only, no emoji in any cell
 5. What has NOT changed and honest limitations
 6. What to do right now: exactly 4 numbered steps, each starting with a bold lead phrase
 7. CTA in italics: one-line question followed by: [Let's talk](/index.html#contact) — one-line value prop.
@@ -57,12 +82,14 @@ Use formal Sie register throughout the German version.
 The blog data file: `src/data/blog/posts.js`
 
 It exports:
+
 - `blogPosts` with `en` and `de` arrays (newest post first)
 - `blogPostContent` with `en` and `de` objects keyed by slug
 
-Prepare all four entries ready to paste:
+Prepare all four entries ready to paste.
 
 **Metadata shape:**
+
 ```js
 {
     slug: "kebab-case-slug",
@@ -86,6 +113,7 @@ All four must be ready to prepend as the first items in their respective arrays/
 Write a complete runnable Python Pillow script that generates a 1200x630 PNG header image.
 
 **FIXED COLOR PALETTE — do not invent different colors:**
+
 - Background: RGB(5, 13, 26) — near-black navy
 - Teal glow top-left: RGB(0, 200, 180)
 - Orange glow bottom-right: RGB(200, 80, 0)
@@ -94,11 +122,13 @@ Write a complete runnable Python Pillow script that generates a 1200x630 PNG hea
 - White text: RGB(255, 255, 255)
 
 **Layout:**
+
 - Left block: eyebrow label, two-line title (line 1 white, line 2 teal), subtitle, tag pills, vertical divider
 - Right block: a diagram relevant to the topic (cards, comparison columns, nodes, hub etc.)
 - Bottom-left: author strip "shantanudutta.com · Mon YYYY" with small teal dot
 
 **Font loading (try in order):**
+
 ```python
 def font(size, bold=False):
     for p in ["/Library/Fonts/Arial Bold.ttf" if bold else "/Library/Fonts/Arial.ttf",
@@ -118,25 +148,31 @@ def font(size, bold=False):
 Create a Gmail **DRAFT** — do NOT send it.
 
 **To:** shantanu.m.dutta@gmail.com
+
 **Subject:** [Blog Draft] POST_TITLE — Ready to Deploy
 
 **Body must contain these sections:**
 
 ### Section A — Topic
-Why this topic was selected and why it is relevant today (2-3 sentences).
+
+Why this topic was selected and why it passed the quality gate (2-3 sentences).
 
 ### Section B — PASTE INTO posts.js
+
 The complete JavaScript for all four entries:
+
 - EN metadata object (prepend to blogPosts.en)
 - DE metadata object (prepend to blogPosts.de)
 - EN content template literal (add to blogPostContent.en)
 - DE content template literal (add to blogPostContent.de)
 
 ### Section C — IMAGE SCRIPT
+
 The complete Python script. Tell Shantanu to save it as `image_gen.py` and run: `python3 image_gen.py`
 
 ### Section D — BUILD AND DEPLOY
-```
+
+```bash
 cd "/Users/shantanudutta/Documents/Shantanu /projects/personal-portfolio"
 python3 image_gen.py
 npm run build
