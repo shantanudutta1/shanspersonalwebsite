@@ -5,7 +5,8 @@ export const translations = {
             experience: "Experience",
             packages: "Packages",
             education: "Education",
-            contact: "Contact"
+            contact: "Contact",
+            blog: "Blog"
         },
         hero: {
             name: "Shantanu Dutta",
@@ -244,7 +245,8 @@ export const translations = {
             experience: "Erfahrung",
             packages: "Pakete",
             education: "Bildung",
-            contact: "Kontakt"
+            contact: "Kontakt",
+            blog: "Blog"
         },
         hero: {
             name: "Shantanu Dutta",

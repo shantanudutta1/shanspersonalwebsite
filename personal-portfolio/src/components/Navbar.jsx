@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 import { translations } from '../translations/translations';
 import './Navbar.css';
@@ -7,29 +8,41 @@ const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const { language, toggleLanguage } = useLanguage();
     const t = translations[language].nav;
+    const location = useLocation();
+    const isHome = location.pathname === '/';
 
     useEffect(() => {
         const handleScroll = () => {
             setScrolled(window.scrollY > 50);
         };
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const sectionHref = (hash) => isHome ? hash : `/${hash}`;
 
     return (
         <nav className={`navbar ${scrolled ? 'scrolled' : ''}`} role="navigation" aria-label="Main navigation">
             <div className="container navbar-container">
-                <a href="#home" className="logo">
+                <a href="/" className="logo">
                     <span className="logo-text">Shantanu</span>
                     <span className="logo-underline" aria-hidden="true"></span>
                 </a>
                 <div className="nav-right">
                     <ul className="nav-links">
-                        <li><a href="#home">{t.home}</a></li>
-                        <li><a href="#experience">{t.experience}</a></li>
-                        <li><a href="#packages">{t.packages}</a></li>
-                        <li><a href="#education">{t.education}</a></li>
-                        <li><a href="#contact">{t.contact}</a></li>
+                        <li><a href={sectionHref('#home')}>{t.home}</a></li>
+                        <li><a href={sectionHref('#experience')}>{t.experience}</a></li>
+                        <li><a href={sectionHref('#packages')}>{t.packages}</a></li>
+                        <li><a href={sectionHref('#education')}>{t.education}</a></li>
+                        <li><a href={sectionHref('#contact')}>{t.contact}</a></li>
+                        <li>
+                            <Link
+                                to="/blog"
+                                className={location.pathname.startsWith('/blog') ? 'nav-blog-active' : ''}
+                            >
+                                {t.blog}
+                            </Link>
+                        </li>
                     </ul>
 
                     <div className="lang-switcher">
