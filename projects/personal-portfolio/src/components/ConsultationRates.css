@@ -1,0 +1,179 @@
+.rates-section {
+    position: relative;
+    /* Relying on global section padding */
+    overflow: hidden;
+    /* to contain glows */
+}
+
+.rates-glow {
+    position: absolute;
+    top: 10%;
+    right: -5%;
+    width: 500px;
+    height: 500px;
+    background: var(--color-blue);
+    border-radius: 50% 40% 60% 50% / 50% 60% 40% 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    z-index: 0;
+    pointer-events: none;
+    animation: blobMove 10s ease-in-out infinite;
+}
+
+.rates-glow-2 {
+    position: absolute;
+    bottom: -10%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: var(--color-teal);
+    border-radius: 40% 60% 50% 50% / 60% 40% 60% 40%;
+    filter: blur(80px);
+    opacity: 0.1;
+    z-index: 0;
+    pointer-events: none;
+    animation: blobMove 12s ease-in-out infinite reverse;
+}
+
+.rates-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 2;
+}
+
+.rates-subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.rates-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2rem;
+    padding: 1rem 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* We augment the global .card style for flex layout */
+.rates-grid .rate-card {
+    display: flex !important;
+    flex-direction: column;
+    padding: 2.5rem 2rem !important;
+    /* Glassmorphism background, border-radius, box-shadow inherited from .card */
+}
+
+/* Highlight the popular tier */
+.rate-card.popular {
+    border-color: rgba(74, 144, 255, 0.4);
+    /* var(--color-blue) at 40% */
+    box-shadow: var(--glow-blue);
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+.rate-card.popular:hover {
+    transform: scale(1.02) translateY(-8px);
+    box-shadow: 0 20px 60px rgba(74, 144, 255, 0.2), var(--glow-blue);
+}
+
+.popular-badge {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-light) 100%);
+    color: var(--color-white);
+    padding: 0.35rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 10px rgba(74, 144, 255, 0.3);
+}
+
+.rate-card-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-dark-border);
+}
+
+.rate-card.popular .rate-card-header {
+    padding-top: 1rem;
+}
+
+.rate-card .role {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-white);
+    margin-bottom: 1rem;
+    min-height: 3rem;
+    /* Aligns titles uniformly */
+    display: flex;
+    align-items: center;
+}
+
+.rate-card .rate {
+    margin-top: 0.5rem;
+}
+
+.rate-card .amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-white);
+}
+
+.rate-card-body {
+    flex-grow: 1;
+    margin-bottom: 2rem;
+}
+
+.rate-card .description {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.rate-card-footer {
+    margin-top: auto;
+}
+
+.btn-primary.rates-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* Adjust button color for popular card to blue */
+.rate-card.popular .btn-primary.rates-btn {
+    background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-light) 100%);
+}
+
+.rate-card.popular .btn-primary.rates-btn:hover {
+    background: linear-gradient(135deg, var(--color-blue-light) 0%, var(--color-blue) 100%);
+    box-shadow: var(--glow-blue);
+}
+
+/* Responsive Grid setup */
+@media (min-width: 768px) {
+    .rates-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .rates-grid {
+        grid-template-columns: repeat(4, 1fr);
+        align-items: stretch;
+    }
+
+    .rate-card.popular {
+        margin: -1rem 0;
+        /* Makes it pop out vertically when side-by-side */
+        padding-bottom: 3.5rem;
+    }
+}
