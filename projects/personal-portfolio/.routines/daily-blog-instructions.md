@@ -73,7 +73,22 @@ Use real-world examples framed as: "In one of the projects I worked on..." or "I
 
 **ABSOLUTE RULE — ZERO EMOJIS:** No emojis anywhere in either language version. Not in body text, tables, headings, lists, bullets, or CTAs. No checkmarks, warnings, X marks, hourglasses, arrows. Replace with plain text: "Act now", "Not yet", "Caution". Emojis make posts look AI-generated. Zero exceptions.
 
-**Format: plain Markdown only.** No HTML tags — no `<p>`, `<h2>`, `<table>`, `<ol>`, `<li>`. Use `##` for headings, `**bold**`, `*italic*`, `[text](url)` for links, `| col |` for tables, `1.` for numbered lists.
+**ABSOLUTE RULE — PLAIN MARKDOWN ONLY. NO HTML.**
+
+The blog is rendered with ReactMarkdown. HTML tags appear as raw text to readers. If you write `<p>`, `<h2>`, `<table>`, `<ol>`, `<li>`, `<strong>`, `<em>`, `<a>` — the site shows them as literal text. Bad.
+
+Use markdown syntax:
+
+- `## Heading` not `<h2>Heading</h2>`
+- `**bold**` not `<strong>bold</strong>`
+- `*italic*` not `<em>italic</em>`
+- `[text](url)` not `<a href="url">text</a>`
+- `| col1 | col2 |\n|---|---|\n| val1 | val2 |` for tables, not `<table>`
+- `1.` `2.` `3.` for numbered lists, not `<ol><li>`
+- `-` for bullet lists, not `<ul><li>`
+- Blank line between paragraphs (no `<p>` tags needed)
+
+When reading the existing posts.js to match style, look at the `\`...\`` template literals after the slug keys — they contain markdown text starting with `## Heading`. Match that format exactly.
 
 **Post structure:**
 
@@ -86,6 +101,8 @@ Use real-world examples framed as: "In one of the projects I worked on..." or "I
 7. CTA in italics: one-line question, then [Let's talk](/index.html#contact) — one-line value prop.
 
 Write both **English (en)** and **German (de)** in FULL. German must be a proper translation, not a summary. Use formal Sie throughout German.
+
+**GERMAN UTF-8 RULE:** Use proper umlauts: `ä ö ü ß Ä Ö Ü` — NEVER write `ae oe ue ss`. Write `läuft` not `laeuft`, `für` not `fuer`, `möchten` not `moechten`, `Größe` not `Groesse`. The file is UTF-8 encoded and supports these characters directly. ASCII transliteration is unprofessional in German.
 
 ---
 
@@ -141,10 +158,18 @@ def font(size, bold=False):
 
 ## STEP 4: Commit everything to GitHub
 
-Write and run this Python script to commit all three files atomically:
+**CRITICAL FILE PATHS — copy these exactly. Do not paraphrase or omit `projects/`:**
+
+- posts.js: `projects/personal-portfolio/src/data/blog/posts.js`
+- image:    `projects/personal-portfolio/public/blog/SLUG.png`
+- sitemap:  `projects/personal-portfolio/public/sitemap.xml`
+
+The `projects/` prefix is required. If you commit to `personal-portfolio/public/blog/...` without the `projects/` prefix, the file lands outside the build directory and the deploy fails.
+
+Write and run this Python script. It uses stable structural anchors (not slug names), so it works regardless of which post was added last:
 
 ```python
-import requests, base64, json, re, sys
+import requests, base64, sys
 from datetime import date
 
 GITHUB_TOKEN = "REPLACE_WITH_TOKEN_FROM_PROMPT"
@@ -182,63 +207,78 @@ def commit_binary(path, filepath, sha, message):
         sys.exit(1)
     print(f"Committed image: {path}")
 
-# ── These are filled in by the routine before running the script ──
-SLUG        = "YOUR-SLUG-HERE"
-EN_META     = """    {
-        slug: "YOUR-SLUG",
-        title: "...",
-        date: "YYYY-MM-DD",
-        excerpt: "...",
-        tags: ["Salesforce", "..."],
-        readTime: 7,
-        image: "/blog/YOUR-SLUG.png",
-        author: "Shantanu Dutta"
-    },"""
+# ── Fill these in BEFORE running ──
+SLUG       = "YOUR-SLUG-HERE"  # kebab-case, no spaces
 
-DE_META     = """    {
-        slug: "YOUR-SLUG",
-        title: "...",
-        date: "YYYY-MM-DD",
-        excerpt: "...",
-        tags: ["Salesforce", "..."],
-        readTime: 7,
-        image: "/blog/YOUR-SLUG.png",
-        author: "Shantanu Dutta"
-    },"""
+# EN_META and DE_META are the JS object literals for the post metadata.
+# IMPORTANT: 8-space indent (to match existing entries), trailing comma included.
+EN_META = """        {
+            slug: "YOUR-SLUG",
+            title: "...",
+            date: "YYYY-MM-DD",
+            excerpt: "...",
+            tags: ["Salesforce", "..."],
+            readTime: 7,
+            image: "/blog/YOUR-SLUG.png",
+            author: "Shantanu Dutta"
+        },"""
 
-EN_CONTENT  = '"""...full EN markdown content..."""'
-DE_CONTENT  = '"""...full DE markdown content..."""'
+DE_META = """        {
+            slug: "YOUR-SLUG",
+            title: "... (German)",
+            date: "YYYY-MM-DD",
+            excerpt: "... (German with proper umlauts)",
+            tags: ["Salesforce", "..."],
+            readTime: 7,
+            image: "/blog/YOUR-SLUG.png",
+            author: "Shantanu Dutta"
+        },"""
 
-TODAY       = date.today().isoformat()
+# Content strings — PURE MARKDOWN. No HTML. Use proper UTF-8 umlauts in German.
+EN_CONTENT = """## The Hook Heading
+
+Opening paragraph here...
+
+## Next section..."""
+
+DE_CONTENT = """## Die Hook-Überschrift
+
+Einleitender Absatz hier...
+
+## Nächster Abschnitt..."""
+
+TODAY = date.today().isoformat()
 
 # ── 1. Update posts.js ──
 POSTS_PATH = "projects/personal-portfolio/src/data/blog/posts.js"
 posts_content, posts_sha = get_file(POSTS_PATH)
+if posts_content is None:
+    print("ERROR: could not fetch posts.js")
+    sys.exit(1)
 
-# Prepend EN metadata (first item in en array)
-posts_content = posts_content.replace(
-    "    en: [\n",
-    f"    en: [\n{EN_META}\n",
-    1
-)
-# Prepend DE metadata (first item in de array)
-posts_content = posts_content.replace(
-    "    de: [\n",
-    f"    de: [\n{DE_META}\n",
-    1
-)
-# Prepend EN content (first key in en object of blogPostContent)
-posts_content = re.sub(
-    r'(export const blogPostContent = \{\s*\n\s*en: \{)',
-    f'\\1\n        "{SLUG}": `{EN_CONTENT}`,\n',
-    posts_content, count=1
-)
-# Prepend DE content (first key in de object of blogPostContent)
-posts_content = re.sub(
-    r'(        "salesforce-headless-360": `[^`]*`,\s*\n\s*de: \{)',
-    f'\\1\n        "{SLUG}": `{DE_CONTENT}`,\n',
-    posts_content, count=1
-)
+# Prepend EN metadata: insert right after the first occurrence of "    en: [\n"
+EN_ARRAY_OPEN = "    en: [\n"
+i = posts_content.find(EN_ARRAY_OPEN)
+posts_content = posts_content[:i+len(EN_ARRAY_OPEN)] + EN_META + "\n" + posts_content[i+len(EN_ARRAY_OPEN):]
+
+# Prepend DE metadata: first occurrence of "    de: [\n" (now after EN insert)
+DE_ARRAY_OPEN = "    de: [\n"
+i = posts_content.find(DE_ARRAY_OPEN)
+posts_content = posts_content[:i+len(DE_ARRAY_OPEN)] + DE_META + "\n" + posts_content[i+len(DE_ARRAY_OPEN):]
+
+# Prepend EN content: first occurrence of "    en: {\n" within blogPostContent
+# Find "blogPostContent = {" first to anchor correctly
+bpc_idx = posts_content.find("blogPostContent = {")
+EN_OBJ_OPEN = "    en: {\n"
+i = posts_content.find(EN_OBJ_OPEN, bpc_idx)
+en_content_block = f'        "{SLUG}": `{EN_CONTENT}`,\n\n'
+posts_content = posts_content[:i+len(EN_OBJ_OPEN)] + en_content_block + posts_content[i+len(EN_OBJ_OPEN):]
+
+# Prepend DE content: first occurrence of "    de: {\n" after blogPostContent
+DE_OBJ_OPEN = "    de: {\n"
+i = posts_content.find(DE_OBJ_OPEN, bpc_idx)
+de_content_block = f'        "{SLUG}": `{DE_CONTENT}`,\n\n'
+posts_content = posts_content[:i+len(DE_OBJ_OPEN)] + de_content_block + posts_content[i+len(DE_OBJ_OPEN):]
 
 commit_text(POSTS_PATH, posts_content, posts_sha, f"feat(blog): add {SLUG}")
 
@@ -247,7 +287,7 @@ IMG_PATH = f"projects/personal-portfolio/public/blog/{SLUG}.png"
 _, img_sha = get_file(IMG_PATH)
 commit_binary(IMG_PATH, "/tmp/blog-image.png", img_sha, f"feat(blog): add header image for {SLUG}")
 
-# ── 3. Update sitemap ──
+# ── 3. Update sitemap: insert new URL just before </urlset> ──
 SITEMAP_PATH = "projects/personal-portfolio/public/sitemap.xml"
 sitemap, sitemap_sha = get_file(SITEMAP_PATH)
 
@@ -256,19 +296,23 @@ new_url = f"""  <url>
     <lastmod>{TODAY}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>"""
-
-sitemap = sitemap.replace(
-    "  <url>\n    <loc>https://shantanudutta.com/blog/agentforce",
-    f"{new_url}\n  <url>\n    <loc>https://shantanudutta.com/blog/agentforce"
-)
-
+  </url>
+"""
+sitemap = sitemap.replace("</urlset>", new_url + "</urlset>", 1)
 commit_text(SITEMAP_PATH, sitemap, sitemap_sha, f"chore(sitemap): add {SLUG}")
 
 print("All commits done. GitHub Actions will now build and deploy automatically.")
+print(f"Live URL: https://shantanudutta.com/blog/{SLUG}")
 ```
 
-**Important:** Before running, fill in SLUG, EN_META, DE_META, EN_CONTENT, DE_CONTENT with the actual values from Step 2. Replace GITHUB_TOKEN with the token from your prompt.
+**Pre-flight checklist before running the script:**
+
+1. SLUG is kebab-case, all lowercase, no spaces
+2. EN_META and DE_META have 8-space indentation, trailing comma
+3. EN_CONTENT and DE_CONTENT use pure markdown (no `<p>`, `<h2>`, `<table>` tags)
+4. DE_META and DE_CONTENT use proper umlauts (`ä ö ü ß` — not `ae oe ue ss`)
+5. GITHUB_TOKEN replaced with the actual token from the prompt
+6. The image was saved to `/tmp/blog-image.png`
 
 ---
 
