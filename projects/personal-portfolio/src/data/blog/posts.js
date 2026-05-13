@@ -1,16 +1,6 @@
 export const blogPosts = {
     en: [
         {
-            slug: "data-cloud-agentforce-foundation-guide",
-            title: "Data Cloud as the AI Foundation: Why Your Agentforce Project Will Fall Short Without It",
-            date: "2026-05-13",
-            excerpt: "Every Agentforce demo runs on clean sample data. Here is what happens in production when Data Cloud is missing — and a clear decision framework for whether you need it before your go-live.",
-            tags: ["Salesforce", "Data Cloud", "Agentforce", "AI", "Strategy"],
-            readTime: 8,
-            image: "/blog/data-cloud-agentforce-foundation-guide.png",
-            author: "Shantanu Dutta"
-        },
-        {
             slug: "salesforce-headless-360",
             title: "Salesforce Headless 360: Is Your Org Agent-Ready?",
             date: "2026-05-11",
@@ -42,16 +32,6 @@ export const blogPosts = {
         }
     ],
     de: [
-        {
-            slug: "data-cloud-agentforce-foundation-guide",
-            title: "Data Cloud als KI-Fundament: Warum Ihr Agentforce-Projekt ohne Data Cloud scheitern wird",
-            date: "2026-05-13",
-            excerpt: "Jede Agentforce-Demo laeuft auf sauberen Beispieldaten. Hier sehen Sie, was im Produktionsbetrieb passiert, wenn Data Cloud fehlt — mit einem klaren Entscheidungsrahmen fuer Ihr Go-live.",
-            tags: ["Salesforce", "Data Cloud", "Agentforce", "KI", "Strategie"],
-            readTime: 8,
-            image: "/blog/data-cloud-agentforce-foundation-guide.png",
-            author: "Shantanu Dutta"
-        },
         {
             slug: "salesforce-headless-360",
             title: "Salesforce Headless 360: Ist Ihre Organisation Agent-Ready?",
@@ -87,72 +67,6 @@ export const blogPosts = {
 
 export const blogPostContent = {
     en: {
-        "data-cloud-agentforce-foundation-guide": `<p>The question I hear most from clients who are mid-way through an Agentforce implementation is some version of this: do we actually need Data Cloud, or can we go live without it? It is almost always asked after the budget for the agent has been approved but before Data Cloud has been scoped. My answer is always the same: it depends on what resolution rate you are willing to accept.</p>
-
-<p>Here is the honest breakdown — what Data Cloud gives Agentforce, what you lose without it, and how to decide whether your current situation can tolerate that gap.</p>
-
-<h2>What Data Cloud Actually Gives an Agentforce Agent</h2>
-
-<p>Agentforce agents answer questions, take actions, and make decisions. The quality of those decisions is entirely determined by what data they can see. Without Data Cloud, an agent has access to whatever lives natively in your Salesforce org: cases, contacts, accounts, and knowledge articles. That is a reasonable starting point, but it has three structural problems.</p>
-
-<p>First, most enterprise clients have data in more than one system. ERP data, web engagement data, product usage data, and support history often live in Snowflake, SAP, or a custom data warehouse. Without Data Cloud, that context is invisible to the agent. Second, what lives in Salesforce is often inconsistent — duplicated records, unmapped fields, incomplete contact profiles. Data Cloud's identity resolution layer merges those records into a single unified profile. Third, the agent has no sense of recency or priority without activation. It cannot distinguish a customer who renewed last month from one who has been escalating for three months.</p>
-
-<h2>The Three Pillars: What Data Cloud Contributes to Agent Performance</h2>
-
-<h3>1. Unified Customer Profile</h3>
-
-<p>Data Cloud builds a merged identity across all your data sources. In one of the projects I worked on — a retail financial services client — the Salesforce org had 40,000 duplicate contact records accumulated over eight years. When Agentforce first ran against that data, it treated the same customer as seventeen different people across different cases. The resolution rates were in the low 30 percent range. After running Data Cloud's identity resolution and cleansing the unified profile, the same agent reached 71 percent automated resolution on the same case types. The agent did not change. The data did.</p>
-
-<p>The unified profile is not just about duplicates. It is also about completeness. An agent that can see a customer's full engagement history — web visits, past purchases, open support cases, recent contract changes — makes materially better decisions than one working from a partial account record.</p>
-
-<h3>2. Real-Time Segmentation and Context Signals</h3>
-
-<p>Data Cloud lets you define calculated insights and segment membership that update continuously. These surface to the agent as context signals: this customer is in the at-risk renewal segment, this one has had three failed service attempts in the last 14 days, this account has a contract renewal in 30 days.</p>
-
-<p>Without these signals, the agent operates on static field values. It reads the Account field Contract Status: Active but has no way of knowing the renewal is imminent or that there has been escalating dissatisfaction. I have seen implementations where the agent was technically resolving cases — closing tickets without human involvement — but CSAT dropped because the agent was working without context that would have led it to escalate or offer a retention gesture. Static field access looks like accuracy in testing. Context signals are what make it look like intelligence in production.</p>
-
-<h3>3. Grounding: Giving the Agent Current, Accurate Facts</h3>
-
-<p>Agentforce agents are grounded — they use retrieval to answer factual questions about your business rather than relying on the base model's training data. The quality of that grounding depends on what you connect. Knowledge articles from Salesforce Knowledge are the baseline. Data Cloud adds structured product, usage, and transaction data to the grounding layer.</p>
-
-<p>In practice, this means an agent asked what is the status of my order can retrieve an accurate real-time answer sourced from your ERP through Data Cloud, rather than returning a case record that was last updated two days ago. The customer asks one question. Without Data Cloud, the agent gives a stale answer. With it, the agent gives the right answer. The difference in customer experience is not subtle.</p>
-
-<h2>When You Can Proceed Without Data Cloud</h2>
-
-<table>
-<thead>
-<tr><th>Scenario</th><th>Recommendation</th><th>Reason</th></tr>
-</thead>
-<tbody>
-<tr><td>Single-channel, knowledge-base deflection only</td><td>Proceed without</td><td>Static knowledge articles are sufficient for FAQ deflection</td></tr>
-<tr><td>Clean Salesforce data, all context in the org</td><td>Proceed without</td><td>If your data is unified and current, the gap is manageable</td></tr>
-<tr><td>Proof of concept, limited scope</td><td>Proceed without for now</td><td>Prove agent ROI first, add Data Cloud in Phase 2</td></tr>
-<tr><td>Multi-system data, enterprise contact center</td><td>Data Cloud required</td><td>Agent cannot see critical context without unification</td></tr>
-<tr><td>High-volume transactional queries</td><td>Data Cloud required</td><td>Real-time transactional data must flow from source systems</td></tr>
-<tr><td>Duplicate-heavy Salesforce org</td><td>Data Cloud required</td><td>Identity resolution is a prerequisite for reliable answers</td></tr>
-<tr><td>Renewal and retention use cases</td><td>Data Cloud required</td><td>Segment signals are essential for proactive agent behavior</td></tr>
-</tbody>
-</table>
-
-<h2>What Has Not Changed</h2>
-
-<p>Data Cloud does not fix a broken implementation. I have seen clients invest in full Data Cloud activation and still get poor agent results because the underlying Agentforce topics and actions were poorly designed. Data Cloud improves what a well-built agent can do. It does not compensate for topics that are too broad, actions that call unreliable APIs, or instructions that contradict each other. Build the agent correctly first. Data Cloud multiplies that quality — it does not create it.</p>
-
-<p>The cost structure has also not changed. Data Cloud is licensed separately and billed based on data volume and activation consumption. At the enterprise scale where it delivers the most value, it is not a cheap addition. Clients who add it mid-project without scoping the cost find themselves in uncomfortable conversations with procurement. Have that conversation at the start, not after design is approved.</p>
-
-<p>Integration work still exists. Connecting your ERP, data warehouse, or custom systems to Data Cloud requires proper ingestion configuration, field mapping, and testing. For a greenfield implementation with three or four source systems, budget four to eight weeks for this work alone. It is not a configuration-only task.</p>
-
-<h2>What to Do Right Now</h2>
-
-<ol>
-<li><strong>Audit your data sources before scoping the agent.</strong> List every system that holds customer context relevant to your agent's use case. If more than one system outside Salesforce holds data the agent needs to answer accurately, Data Cloud belongs in your Phase 1 scope, not a later phase.</li>
-<li><strong>Run a duplicate analysis on your Salesforce org.</strong> Request a data quality report from your admin. If your duplicate rate on Contact or Account records exceeds 10 percent, plan for identity resolution before agent go-live. Running a production agent on fragmented identity is a customer experience risk.</li>
-<li><strong>Negotiate the commercial conversation early.</strong> Data Cloud pricing is volume-dependent. Get your Salesforce account executive to model the cost based on your actual data volumes and activation patterns before finalising the project budget. The conversation is much harder after the design is set.</li>
-<li><strong>Pilot with a single Data Cloud connection first.</strong> Do not try to connect all source systems at once. Choose the one system outside Salesforce that holds the most critical agent context — typically your billing or product usage system — and build the Data Cloud connection for that source alone. Validate agent improvement before expanding scope.</li>
-</ol>
-
-<p><em>Wondering whether your Salesforce architecture is ready for Agentforce in production? <a href="/index.html#contact">Let's talk</a> — I'll give you a straight answer based on what I see in your org, not a product pitch.</em></p>`,
-
         "salesforce-headless-360": `## The Question Every Client Is Asking
 
 "Do we actually need to care about Headless 360?"
@@ -367,71 +281,6 @@ If you answered "no" to all three, start with CPQ. You can always migrate to Rev
 *Evaluating CPQ vs Revenue Cloud for your organization? [Let's discuss your specific requirements](/index.html#contact) — every business has unique needs that don't fit neatly into a blog post.*`
     },
     de: {
-        "data-cloud-agentforce-foundation-guide": `<p>Die Frage, die ich am haeufigsten von Kunden hoere, die sich mitten in einer Agentforce-Implementierung befinden, lautet in etwa so: Brauchen wir wirklich Data Cloud, oder koennen wir auch ohne live gehen? Sie wird fast immer gestellt, nachdem das Budget fuer den Agenten genehmigt wurde, aber bevor Data Cloud ueberhaupt in der Planung aufgetaucht ist. Meine Antwort ist immer dieselbe: Es kommt darauf an, welche Loesungsquote Sie akzeptieren koennen.</p>
-
-<p>Hier ist die ehrliche Einschaetzung: Was Data Cloud einem Agentforce-Agenten gibt, was ohne es verloren geht, und wie Sie entscheiden, ob Ihre aktuelle Situation diese Luecke verkraften kann.</p>
-
-<h2>Was Data Cloud einem Agentforce-Agenten tatsaechlich gibt</h2>
-
-<p>Agentforce-Agenten beantworten Fragen, fuehren Aktionen aus und treffen Entscheidungen. Die Qualitaet dieser Entscheidungen haengt vollstaendig davon ab, welche Daten ihnen zur Verfuegung stehen. Ohne Data Cloud hat ein Agent Zugriff auf alles, was nativ in Ihrer Salesforce-Organisation lebt: Cases, Kontakte, Accounts und Wissensdatenbank-Artikel. Das ist ein vernuenftiger Ausgangspunkt, hat aber drei strukturelle Probleme.</p>
-
-<p>Erstens haben die meisten Enterprise-Kunden Daten in mehr als einem System. ERP-Daten, Web-Interaktionsdaten, Produktnutzungsdaten und Supporthistorie leben oft in Snowflake, SAP oder einem eigenen Data Warehouse. Ohne Data Cloud ist dieser Kontext fuer den Agenten unsichtbar. Zweitens ist das, was in Salesforce lebt, oft inkonsistent: duplizierte Datensaetze, nicht gemappte Felder, unvollstaendige Kontaktprofile. Die Identity-Resolution-Schicht von Data Cloud fuehrt diese Datensaetze zu einem einheitlichen Profil zusammen. Drittens hat der Agent ohne Aktivierung kein Gespur fuer Aktualitaet oder Prioritaet. Er kann nicht unterscheiden, ob ein Kunde letzten Monat verlaengert hat oder seit drei Monaten eskaliert.</p>
-
-<h2>Die drei Saeulen: Was Data Cloud zur Agentenleistung beitraegt</h2>
-
-<h3>1. Einheitliches Kundenprofil</h3>
-
-<p>Data Cloud erstellt eine zusammengefuehrte Identitaet aus allen Ihren Datenquellen. In einem der Projekte, an denen ich gearbeitet habe — einem Kunden aus der Finanzdienstleistungsbranche — hatte die Salesforce-Organisation 40.000 doppelte Kontaktdatensaetze, die ueber acht Jahre angesammelt worden waren. Als Agentforce erstmals gegen diese Daten lief, behandelte er denselben Kunden als siebzehn verschiedene Personen in verschiedenen Cases. Die Loesungsquoten lagen im niedrigen 30-Prozent-Bereich. Nach der Ausfuehrung der Identity Resolution von Data Cloud und der Bereinigung des einheitlichen Profils erreichte derselbe Agent 71 Prozent automatisierte Aufloesung bei denselben Case-Typen. Der Agent hat sich nicht veraendert. Die Daten haben es getan.</p>
-
-<p>Das einheitliche Profil geht nicht nur um Duplikate. Es geht auch um Vollstaendigkeit. Ein Agent, der die gesamte Interaktionshistorie eines Kunden sehen kann — Web-Besuche, vergangene Kaeufe, offene Support-Cases, kuerzliche Vertragsaenderungen — trifft wesentlich bessere Entscheidungen als einer, der mit einem unvollstaendigen Account-Datensatz arbeitet.</p>
-
-<h3>2. Echtzeit-Segmentierung und Kontextsignale</h3>
-
-<p>Data Cloud ermoeglicht es Ihnen, berechnete Erkenntnisse und Segmentzugehoerigkeiten zu definieren, die kontinuierlich aktualisiert werden. Diese werden dem Agenten als Kontextsignale zugaenglich gemacht: Dieser Kunde befindet sich im Segment gefaehrdete Verlaengerung, dieser hatte in den letzten 14 Tagen drei fehlgeschlagene Service-Versuche, bei diesem Account steht in 30 Tagen eine Vertragsverlaengerung an.</p>
-
-<p>Ohne diese Signale arbeitet der Agent mit statischen Feldwerten. Er liest das Account-Feld Vertragsstatus: Aktiv, hat aber keine Moeglichkeit zu wissen, dass die Verlaengerung unmittelbar bevorsteht oder dass es zunehmende Unzufriedenheit gab. Ich habe Implementierungen erlebt, bei denen der Agent technisch gesehen Cases loeaste, aber der CSAT sank, weil er Cases ohne den Kontext schloss, der ihn dazu gebracht haette, zu eskalieren oder eine Kundenbindungsgeste anzubieten. Statischer Feldzugriff sieht bei Tests wie Genauigkeit aus. Kontextsignale sind das, was im Produktionsbetrieb wie Intelligenz aussieht.</p>
-
-<h3>3. Grounding: Dem Agenten aktuelle, genaue Fakten geben</h3>
-
-<p>Agentforce-Agenten sind geerdet: Sie verwenden Retrieval, um sachliche Fragen zu Ihrem Unternehmen zu beantworten, anstatt sich auf die Trainingsdaten des Basismodells zu verlassen. Die Qualitaet dieses Groundings haengt davon ab, was Sie verbinden. Wissensdatenbank-Artikel aus Salesforce Knowledge sind die Basis. Data Cloud fuegt dem Grounding-Layer strukturierte Produkt-, Nutzungs- und Transaktionsdaten hinzu.</p>
-
-<p>In der Praxis bedeutet das: Ein Agent, der gefragt wird, was ist der Status meiner Bestellung, kann eine genaue Echtzeit-Antwort aus Ihrem ERP ueber Data Cloud abrufen, anstatt einen Case-Datensatz zurueckzugeben, der vor zwei Tagen zuletzt aktualisiert wurde. Der Kunde stellt eine Frage. Ohne Data Cloud gibt der Agent eine veraltete Antwort. Mit ihm gibt der Agent die richtige Antwort. Der Unterschied im Kundenerlebnis ist nicht subtil.</p>
-
-<h2>Wann Sie ohne Data Cloud vorgehen koennen</h2>
-
-<table>
-<thead>
-<tr><th>Szenario</th><th>Empfehlung</th><th>Grund</th></tr>
-</thead>
-<tbody>
-<tr><td>Nur Wissensdatenbank-Deflection, ein Kanal</td><td>Ohne Data Cloud moeglich</td><td>Statische Artikel reichen fuer FAQ-Deflection aus</td></tr>
-<tr><td>Saubere Salesforce-Daten, gesamter Kontext in der Org</td><td>Ohne Data Cloud moeglich</td><td>Wenn Ihre Daten einheitlich und aktuell sind, ist die Luecke beherrschbar</td></tr>
-<tr><td>Proof of Concept, begrenzter Umfang</td><td>Vorerst ohne Data Cloud</td><td>Erst Agenten-ROI beweisen, Data Cloud in Phase 2</td></tr>
-<tr><td>Multi-System-Daten, Enterprise Contact Center</td><td>Data Cloud erforderlich</td><td>Agent kann ohne Vereinheitlichung keinen kritischen Kontext sehen</td></tr>
-<tr><td>Hohe Transaktionsabfragen (Bestellung, Abrechnung)</td><td>Data Cloud erforderlich</td><td>Echtzeit-Transaktionsdaten muessen aus Quellsystemen fliessen</td></tr>
-<tr><td>Salesforce-Org mit vielen Duplikaten</td><td>Data Cloud erforderlich</td><td>Identity Resolution ist Voraussetzung fuer zuverlaessige Antworten</td></tr>
-<tr><td>Verlaengerungs- und Kundenbindungsanwendungsfaelle</td><td>Data Cloud erforderlich</td><td>Segment-Signale sind fuer proaktives Agentenverhalten unerlasslich</td></tr>
-</tbody>
-</table>
-
-<h2>Was sich nicht geaendert hat</h2>
-
-<p>Data Cloud repariert keine fehlerhafte Implementierung. Ich habe Kunden erlebt, die in vollstaendige Data Cloud-Aktivierung investiert haben und trotzdem schlechte Agentenergebnisse erzielten, weil die zugrundeliegenden Agentforce-Themen und -Aktionen schlecht gestaltet waren. Data Cloud verbessert, was ein gut aufgebauter Agent leisten kann. Es kompensiert keine Themen, die zu breit sind, keine Aktionen, die unzuverlaessige APIs aufrufen, oder keine Anweisungen, die sich gegenseitig widersprechen. Bauen Sie zuerst den Agenten korrekt auf. Data Cloud multipliziert diese Qualitaet — es erschafft sie nicht.</p>
-
-<p>Die Kostenstruktur hat sich ebenfalls nicht geaendert. Data Cloud wird separat lizenziert und nach Datenvolumen und Aktivierungsverbrauch abgerechnet. Im Enterprise-Massstab, wo es den groessten Mehrwert liefert, ist es kein guenstiger Zusatz. Kunden, die es mitten im Projekt hinzufuegen ohne die Kosten zu kalkulieren, finden sich in unangenehmen Gespraechen mit dem Einkauf wieder. Fuehren Sie dieses Gespraech zu Beginn, nicht nachdem das Design genehmigt wurde.</p>
-
-<p>Integrationsarbeit bleibt bestehen. Die Verbindung Ihres ERP, Data Warehouse oder benutzerdefinierter Systeme mit Data Cloud erfordert ordnungsgemaesse Ingestion-Konfiguration, Feld-Mapping und Tests. Fuer eine Greenfield-Implementierung mit drei oder vier Quellsystemen sollten Sie allein fuer diese Arbeit vier bis acht Wochen einplanen. Es ist keine reine Konfigurationsaufgabe.</p>
-
-<h2>Was Sie jetzt tun sollten</h2>
-
-<ol>
-<li><strong>Datenquellen vor der Agentenplanung pruefen.</strong> Listen Sie jedes System auf, das Kundenkontext enthaelt, der fuer den Anwendungsfall Ihres Agenten relevant ist. Wenn mehr als ein System ausserhalb von Salesforce Daten enthaelt, die der Agent benoetigt, gehoert Data Cloud in Ihren Phase-1-Umfang, nicht in eine spaetere Phase.</li>
-<li><strong>Duplikatanalyse Ihrer Salesforce-Org durchfuehren.</strong> Bitten Sie Ihren Administrator um einen Datenqualitaetsbericht. Wenn Ihre Duplikatrate bei Kontakt- oder Account-Datensaetzen 10 Prozent uebersteigt, planen Sie eine Identity Resolution vor dem Agenten-Go-live. Einen Produktionsagenten auf fragmentierter Identitaet zu betreiben ist ein Kundenerlebnisrisiko.</li>
-<li><strong>Kostenverhandlung fruehzeitig fuehren.</strong> Data Cloud-Preise sind volumenabhaengig. Bitten Sie Ihren Salesforce Account Executive, die Kosten basierend auf Ihren tatsaechlichen Datenvolumen zu modellieren, bevor das Projektbudget finalisiert wird. Das Gespraech ist nach dem Design-Freeze viel schwieriger.</li>
-<li><strong>Pilotprojekt mit einer einzelnen Data Cloud-Verbindung starten.</strong> Versuchen Sie nicht, alle Quellsysteme auf einmal zu verbinden. Waehlen Sie das eine System ausserhalb von Salesforce, das den kritischsten Agentenkontext enthaelt — typischerweise Ihr Abrechnungs- oder Produktnutzungssystem — und bauen Sie die Data Cloud-Verbindung nur fuer diese Quelle. Validieren Sie die Agentenverbesserung, bevor Sie den Umfang erweitern.</li>
-</ol>
-
-<p><em>Moechten Sie wissen, ob Ihre Salesforce-Architektur tatsaechlich produktionsreif fuer Agentforce ist? <a href="/index.html#contact">Lassen Sie uns sprechen</a> — ich gebe Ihnen eine klare Antwort auf Basis Ihrer Org, kein Produktpitch.</em></p>`,
         "salesforce-headless-360": `## Die Frage, die jeder Kunde stellt
 
 „Müssen wir uns wirklich um Headless 360 kümmern?"
