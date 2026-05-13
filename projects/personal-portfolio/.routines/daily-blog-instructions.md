@@ -1,6 +1,6 @@
 # Daily Salesforce Blog Draft Routine Instructions
 
-You are running a daily routine for Shantanu Dutta — senior Salesforce freelance consultant at <https://shantanudutta.com>.
+You are running a daily routine for Shantanu Dutta — senior Salesforce freelance consultant at [shantanudutta.com](https://shantanudutta.com).
 Email all output to: shantanu.m.dutta@gmail.com
 
 ---
@@ -75,6 +75,8 @@ Write both the **English (en)** and **German (de)** versions in FULL.
 The German version must be a proper natural translation, not a summary.
 Use formal Sie register throughout the German version.
 
+**Format: plain Markdown only.** No HTML tags whatsoever — no `<p>`, `<h2>`, `<table>`, `<ol>`, `<li>`, `<strong>`, `<em>`, `<a>`. Use markdown equivalents: `##` for headings, `**bold**` for bold, `*italic*` for italic, `[text](url)` for links, `| col |` for tables, `1.` for numbered lists. The blog renders content with ReactMarkdown — HTML tags will appear as raw text to readers.
+
 ---
 
 ## STEP 3: Format the posts.js entries
@@ -147,7 +149,7 @@ def font(size, bold=False):
 
 Create a Gmail **DRAFT** — do NOT send it.
 
-**To:** shantanu.m.dutta@gmail.com
+**To:** shantanu.m.dutta \[at\] gmail.com
 
 **Subject:** [Blog Draft] POST_TITLE — Ready to Deploy
 
